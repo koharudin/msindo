@@ -1,69 +1,36 @@
-# Laravel Inventory
+# Laravel
 
 ## 🚧 UNDER DEVELOPMENT 🚧
-
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/visanduma/laravel-inventory.svg?style=flat-square)](https://packagist.org/packages/visanduma/laravel-inventory)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/visanduma/laravel-inventory/run-tests?label=tests)](https://github.com/visanduma/laravel-inventory/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/visanduma/laravel-inventory/Fix%20PHP%20code%20style%20issues?label=code%20style)](https://github.com/visanduma/laravel-inventory/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/visanduma/laravel-inventory.svg?style=flat-square)](https://packagist.org/packages/visanduma/laravel-inventory)
 
 Simple & reliable inventory management package for Laravel
 
 ## Installation
 
-You can install the package via composer:
+Sehabis didownload aplikasinya silahkan copy command dibawah:
 
 ```bash
-composer require visanduma/laravel-inventory
+composer update
 ```
 
-You can publish and run the migrations with:
+atau
 
 ```bash
-php artisan vendor:publish --tag="inventory-migrations"
-php artisan migrate
+composer install
 ```
 
-You can publish the config file with:
+jika tidak berhasil.
+
+sehabis itu copy command dibawah:
 
 ```bash
-php artisan vendor:publish --tag="inventory-config"
+php artisan migrate --seed
 ```
 
-This is the contents of the published config file:
-
-```php
-return [
-	 'table_name_prefix' => 'la'
-];
-```
-
-## Usage
-
-
-## Testing
+lalu jalankan perintah untuk melakukan testing di local server:
 
 ```bash
-composer test
+php artisan serve
 ```
-
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
-
-## Contributing
-
-Please see [CONTRIBUTING](https://github.com/Visanduma/.github/blob/main/CONTRIBUTING.md) for details.
-
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
-
-## Credits
-
-- [Visanduma](https://github.com/Visanduma)
-- [LaHiRu](https://github.com/lahirulhr)
-- [All Contributors](../../contributors)
 
 ## License
 
