@@ -8,6 +8,17 @@
     </div>
     <div class="card">
         <div class="card-header">
+            Prediksi
+         </div>
+         <div class="card-body">
+             @if ($bestPrediction)
+             <p>Hasil Prediksi untuk bulan {{ $bestPrediction['month'] }} - {{ $bestPrediction['year'] }} adalah {{ round($bestPrediction['predicted_qty']) }} dengan alpha {{ round($alphaBest, 2) }}</p>
+             @endif
+         </div>
+         <div class="card-header">
+             Product Table
+         </div>
+        <div class="card-header">
             Sales Table
         </div>
         <div class="card-body">

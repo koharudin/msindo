@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sales;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -9,8 +10,79 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::all();
-        return view('products.index', compact('products'));
+                // Ambil data penjualan
+                $salesData = Sales::selectRaw('YEAR(sell_date) as year, MONTH(sell_date) as month, SUM(qty) as qty')
+                ->groupByRaw('YEAR(sell_date), MONTH(sell_date)')
+                ->orderByRaw('YEAR(sell_date)')
+                ->orderByRaw('MONTH(sell_date)')
+                ->get();
+    
+            $actualTotals = $salesData->pluck('qty')->toArray();
+    
+            $alphaBest = 0;
+            $minMape = PHP_INT_MAX;
+    
+            // Coba nilai alpha dari 0.1 hingga 0.9
+            for ($alpha = 0.1; $alpha <= 0.9; $alpha += 0.1) {
+                $smoothedTotals = [];
+                $lastTotal = $actualTotals[0];  // Inisialisasi dengan qty penjualan pertama
+    
+                foreach ($actualTotals as $actualTotal) {
+                    $smoothedTotal = $alpha * $actualTotal + (1 - $alpha) * $lastTotal;
+                    $smoothedTotals[] = $smoothedTotal;
+                    $lastTotal = $smoothedTotal;
+                }
+    
+                $mapes = [];
+                foreach ($actualTotals as $index => $actualTotal) {
+                    $mape = abs(($actualTotal - $smoothedTotals[$index]) / $actualTotal) * 100;
+                    $mapes[] = $mape;
+                }
+    
+                $averageMape = array_sum($mapes) / count($mapes);
+    
+                if ($averageMape < $minMape) {
+                    $minMape = $averageMape;
+                    $alphaBest = $alpha;
+                }
+            }
+    
+            // Prediksi dengan alpha terbaik
+            $predictions = [];
+            $lastTotal = $actualTotals[count($actualTotals) - 1];
+    
+            for ($i = 0; $i < 1; $i++) {
+                $lastTotal = $alphaBest * $lastTotal + (1 - $alphaBest) * $lastTotal;
+    
+                $currentYear = 2024;
+                $currentMonth = 8 + $i;
+                if ($currentMonth > 12) {
+                    $currentMonth -= 12;
+                    $currentYear++;
+                }
+    
+                $predictions[] = [
+                    'year' => $currentYear,
+                    'month' => $currentMonth,
+                    'predicted_qty' => $lastTotal,
+                    'alpha' => $alphaBest,
+                    'mape' => $this->calculateMape($actualTotals, $lastTotal),
+                ];
+            }
+    
+            // Temukan prediksi dengan MAPE terkecil
+            $bestPrediction = collect($predictions)->sortBy('mape')->first();
+            
+            $products = Product::all();
+
+            return view('products.index', [
+                'salesData' => $salesData,
+                'predictions' => $predictions,
+                'bestPrediction' => $bestPrediction,
+                'alphaBest' => $alphaBest,
+                'minMape' => $minMape,
+                'products' => $products,
+            ]);
     }
 
     public function create()
@@ -53,5 +125,23 @@ class ProductController extends Controller
     {
         $product->delete();
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
+    }
+    
+    private function calculateMape($actualTotals, $predictedTotal)
+    {
+        $mapeSum = 0;
+        $count = count($actualTotals);
+
+        foreach ($actualTotals as $actualTotal) {
+            $mapeSum += abs(($actualTotal - $predictedTotal) / $actualTotal) * 100;
+        }
+
+        return $mapeSum / $count;
+    }
+
+    private function calculateTotal($productId, $qty)
+    {
+        $product = Product::find($productId);
+        return $product->price * $qty;
     }
 }

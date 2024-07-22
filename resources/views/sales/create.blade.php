@@ -8,7 +8,7 @@
             Create Sale
         </div>
         <div class="card-body">
-            <form action="{{ route('sales.store') }}" method="POST">
+            <form id="sale-form" action="{{ route('sales.store') }}" method="POST">
                 @csrf
                 <div class="form-group mt-4">
                     <label for="name">Name</label>
@@ -26,7 +26,7 @@
                     <label for="product_id">Product</label>
                     <select class="form-control" id="product_id" name="product_id" required>
                         @foreach ($products as $product)
-                            <option value="{{ $product->id }}">{{ $product->name }} - ${{ $product->price }}</option>
+                            <option value="{{ $product->id }}" data-stock="{{ $product->stock }}">{{ $product->name }} - ${{ $product->price }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -43,4 +43,39 @@
         </div>
     </div>
 </div>
+
+@push('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('sale-form');
+            const productSelect = document.getElementById('product_id');
+            const qtyInput = document.getElementById('qty');
+
+            form.addEventListener('submit', function (event) {
+                const selectedOption = productSelect.options[productSelect.selectedIndex];
+                const stock = parseInt(selectedOption.getAttribute('data-stock'), 10);
+                const qty = parseInt(qtyInput.value, 10);
+
+                if (qty > stock) {
+                    event.preventDefault();
+                    Swal.fire({
+                        title: 'Warning!',
+                        text: 'Sisa stock telah mencapai Safety Stock. Apakah mau melanjutkan transaksi?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, proceed',
+                        cancelButtonText: 'No, cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit(); // Submit the form if confirmed
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+@endpush
 @endsection

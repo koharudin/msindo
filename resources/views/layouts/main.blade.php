@@ -203,7 +203,7 @@
             </a>
           </li>
           <li>
-            <a href="{{ route('sales.mape') }}">
+            <a href="{{ route('sales.predict') }}">
               <i class="bi bi-circle"></i><span>Sales MAPE</span>
             </a>
           </li>
@@ -234,6 +234,7 @@
 
   <!-- Template Main JS File -->
   <script src="/assets/js/main.js"></script>
+  @stack('js')
 
 </body>
 
