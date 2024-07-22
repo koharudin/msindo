@@ -117,23 +117,18 @@
           <span>Users</span>
         </a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ route('sales.index') }}">
+          <i class="bi bi-currency-dollar"></i>
+          <span>Penjualan</span>
+        </a>
+      </li>
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#sales-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-menu-button-wide"></i><span>Sales</span><i class="bi bi-chevron-down ms-auto"></i>
+        <a class="nav-link collapsed" href="{{ route('sales.predict') }}">
+          <i class="bi bi-bar-chart-fill"></i>
+          <span>Prediksi</span>
         </a>
-        <ul id="sales-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="{{ route('sales.index') }}">
-              <i class="bi bi-circle"></i><span>Sales List</span>
-            </a>
-          </li>
-          <li>
-            <a href="{{ route('sales.predict') }}">
-              <i class="bi bi-circle"></i><span>Sales MAPE</span>
-            </a>
-          </li>
-        </ul>
       </li>
 
     </ul>
