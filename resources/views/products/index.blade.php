@@ -4,7 +4,9 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="card-title mb-0">Product List</h5>
+        @if (Auth::user()->role == 'admin')
         <a href="{{ route('products.create') }}" class="btn btn-primary">Create Product</a>
+        @endif
     </div>
     <div class="card">
         <div class="card-header">
@@ -26,7 +28,9 @@
                         <th>Stock</th>
                         <th>Price</th>
                         <th>Tanggal Pembelian</th>
+                        @if (Auth::user()->role == 'admin')
                         <th>Actions</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -36,6 +40,7 @@
                         <td>{{ $product->stock }}</td>
                         <td>{{ $product->price }}</td>
                         <td>{{ $product->buy_date }}</td>
+                        @if (Auth::user()->role == 'admin')  
                         <td>
                             <a href="{{ route('products.edit', $product->id) }}" class="btn btn-primary">Edit</a>
                             <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display:inline;">
@@ -44,6 +49,7 @@
                                 <button type="submit" class="btn btn-danger">Delete</button>
                             </form>
                         </td>
+                        @endif
                     </tr>
                     @endforeach
                 </tbody>

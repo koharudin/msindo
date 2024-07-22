@@ -4,7 +4,9 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="card-title mb-0">Sales</h5>
+        @if (Auth::user()->role == 'admin')
         <a href="{{ route('sales.create') }}" class="btn btn-primary">Create Sales</a>
+        @endif
     </div>
     <div class="card">
         <div class="card-header">
@@ -14,9 +16,6 @@
              @if ($bestPrediction)
              <p>Hasil Prediksi untuk bulan {{ $bestPrediction['month'] }} - {{ $bestPrediction['year'] }} adalah {{ round($bestPrediction['predicted_qty']) }} dengan alpha {{ round($alphaBest, 2) }}</p>
              @endif
-         </div>
-         <div class="card-header">
-             Product Table
          </div>
         <div class="card-header">
             Sales Table
@@ -33,7 +32,11 @@
                         <th>Quantity</th>
                         <th>Total</th>
                         <th>Sell Date</th>
-                        <th>Actions</th>
+                        @if (Auth::user()->role == 'admin')
+                        <th>Actions</th>         
+                        @else
+                        <th>Nota</th>         
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -48,12 +51,15 @@
                         <td>{{ $sale->total }}</td>
                         <td>{{ $sale->sell_date }}</td>
                         <td>
+                            <a href="{{ route('sales.edit', $sale->id) }}" class="btn btn-warning">Print</a>
+                            @if (Auth::user()->role == 'admin')
                             <a href="{{ route('sales.edit', $sale->id) }}" class="btn btn-primary">Edit</a>
                             <form action="{{ route('sales.destroy', $sale->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">Delete</button>
                             </form>
+                            @endif
                         </td>
                     </tr>
                     @endforeach

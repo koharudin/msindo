@@ -3,8 +3,10 @@
 @section('content')
 <div class="container">
     <div class="card">
+        <div class="card-header">
+            Prediksi
+         </div>
       <div class="card-body">
-        <h2>Prediksi Penjualan</h2>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -29,12 +31,14 @@
         </table>
     
         @if ($bestPrediction)
-            <h2>Prediksi Terbaik</h2>
-            <p>Tahun: {{ $bestPrediction['year'] }}</p>
+        <div class="card-header">
+            Prediksi Terbaik
+         </div>
+            {{-- <p>Tahun: {{ $bestPrediction['year'] }}</p>
             <p>Bulan: {{ $bestPrediction['month'] }}</p>
-            <p>Prediksi Total: {{ round($bestPrediction['predicted_qty']) }}</p>
-            <p>Alpha Terbaik: {{ round($alphaBest, 2) }}</p>
-            <p>MAPE Terbaik: {{ round($minMape, 2) }}%</p>
+            <p>Prediksi Total: {{ round($bestPrediction['predicted_qty']) }}</p> --}}
+            <p>Alpha : {{ round($alphaBest, 2) }}</p>
+            <p>MAPE : {{ round($minMape, 2) }}%</p>
         @endif
             <table class="table table-bordered">
                 <thead>
