@@ -23,6 +23,12 @@ jika tidak berhasil.
 sehabis itu copy command dibawah:
 
 ```bash
+cp .env.example .env
+```
+
+
+
+```bash
 php artisan migrate --seed
 ```
 
