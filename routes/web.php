@@ -11,7 +11,13 @@ Route::get('/', function () {
 });
 
 Auth::routes();
-Route::resource('products', ProductController::class);
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+Route::get('/products/rop', [ProductController::class, 'showRopFromSales'])->name('products.rop');
 Route::get('/sales/predict', [SalesController::class, 'predict'])->name('sales.predict');
 Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
 Route::get('/sales/create', [SalesController::class, 'create'])->name('sales.create');

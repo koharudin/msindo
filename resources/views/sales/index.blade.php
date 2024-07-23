@@ -48,7 +48,7 @@
                         <td>{{ $sale->invoice_number }}</td>
                         <td>{{ $sale->product->name }}</td>
                         <td>{{ $sale->qty }}</td>
-                        <td>{{ $sale->total }}</td>
+                        <td>{{ 'Rp ' . number_format($sale->total, 0, ',', '.') }}</td>
                         <td>{{ $sale->sell_date }}</td>
                         <td>
                             <a href="{{ route('sales.edit', $sale->id) }}" class="btn btn-warning">Print</a>
@@ -62,7 +62,7 @@
                             @endif
                         </td>
                     </tr>
-                    @endforeach
+                    @endforeach                    
                 </tbody>
             </table>
         </div>

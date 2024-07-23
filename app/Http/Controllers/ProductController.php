@@ -55,7 +55,7 @@ class ProductController extends Controller
                 $lastTotal = $alphaBest * $lastTotal + (1 - $alphaBest) * $lastTotal;
     
                 $currentYear = 2024;
-                $currentMonth = 8 + $i;
+                $currentMonth = 7 + $i;
                 if ($currentMonth > 12) {
                     $currentMonth -= 12;
                     $currentYear++;
@@ -143,5 +143,65 @@ class ProductController extends Controller
     {
         $product = Product::find($productId);
         return $product->price * $qty;
+    }
+
+    public function showRopFromSales()
+    {
+        $products = Product::all();
+
+        foreach ($products as $product) {
+            $rop = $this->calculateRopFromSales($product);
+            $product->rop = $rop;
+        }
+
+        return view('products.rop-from-sales', [
+            'products' => $products,
+        ]);
+    }
+
+    private function calculateRopFromSales(Product $product)
+    {
+        // Example: Replace with actual lead time
+        $leadTime = 7; // days
+        
+        // Get average daily usage
+        $averageDailyUsage = $this->calculateAverageDailyUsage($product);
+
+        // Get safety stock
+        $safetyStock = $this->calculateSafetyStock($product);
+
+        return ($averageDailyUsage * $leadTime) + $safetyStock;
+    }
+
+    private function calculateAverageDailyUsage(Product $product)
+    {
+        // Calculate the average daily usage of the product based on sales data
+        $sales = Sales::where('product_id', $product->id)->get();
+        $totalQuantity = $sales->sum('qty');
+        $totalDays = $sales->count();
+
+        return $totalDays ? $totalQuantity / $totalDays : 0;
+    }
+
+    private function calculateSafetyStock(Product $product)
+    {
+        // Example: Z-score for 95% service level
+        $zScore = 1.65;
+        $standardDeviation = $this->calculateDemandStandardDeviation($product);
+
+        return $zScore * $standardDeviation;
+    }
+
+    private function calculateDemandStandardDeviation(Product $product)
+    {
+        // Calculate the standard deviation of demand for the product
+        $sales = Sales::where('product_id', $product->id)->get();
+        $totalQuantity = $sales->sum('qty');
+        $mean = $totalQuantity / $sales->count();
+        $sumOfSquares = $sales->reduce(function ($carry, $sale) use ($mean) {
+            return $carry + pow($sale->qty - $mean, 2);
+        }, 0);
+
+        return sqrt($sumOfSquares / ($sales->count() - 1));
     }
 }

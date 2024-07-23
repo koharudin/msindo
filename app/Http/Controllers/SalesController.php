@@ -29,7 +29,7 @@ class SalesController extends Controller
             // Coba nilai alpha dari 0.1 hingga 0.9
             for ($alpha = 0.1; $alpha <= 0.9; $alpha += 0.1) {
                 $smoothedQtys = [];
-                $lastQty = $actualQtys[0];  // Inisialisasi dengan qty penjualan pertama
+                $lastQty = $actualQtys[0];
     
                 foreach ($actualQtys as $actualQty) {
                     $smoothedQty = $alpha * $actualQty + (1 - $alpha) * $lastQty;
@@ -51,7 +51,6 @@ class SalesController extends Controller
                 }
             }
     
-            // Prediksi dengan alpha terbaik
             $predictions = [];
             $lastQty = $actualQtys[count($actualQtys) - 1];
     
@@ -59,7 +58,7 @@ class SalesController extends Controller
                 $lastQty = $alphaBest * $lastQty + (1 - $alphaBest) * $lastQty;
     
                 $currentYear = 2024;
-                $currentMonth = 8 + $i;
+                $currentMonth = 7 + $i;
                 if ($currentMonth > 12) {
                     $currentMonth -= 12;
                     $currentYear++;
@@ -74,7 +73,6 @@ class SalesController extends Controller
                 ];
             }
     
-            // Temukan prediksi dengan MAPE terkecil
             $bestPrediction = collect($predictions)->sortBy('mape')->first();
     
             $sales = Sales::all();
@@ -223,7 +221,7 @@ class SalesController extends Controller
             $lastQty = $alphaBest * $lastQty + (1 - $alphaBest) * $lastQty;
 
             $currentYear = 2024;
-            $currentMonth = 8 + $i;
+            $currentMonth = 7 + $i;
             if ($currentMonth > 12) {
                 $currentMonth -= 12;
                 $currentYear++;

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Sales;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,6 +25,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $sales = Sales::all()->count();
+        $revenue = Sales::sum('total');
+        $users = User::all()->count();
+        return view('home', compact('sales', 'revenue', 'users'));
     }
 }
