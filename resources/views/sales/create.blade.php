@@ -23,10 +23,10 @@
                     <input type="text" class="form-control" id="address" name="address" required>
                 </div>
                 <div class="form-group mt-4">
-                    <label for="product_id">Product</label>
-                    <select class="form-control" id="product_id" name="product_id" required>
-                        @foreach ($products as $product)
-                            <option value="{{ $product->id }}" data-stock="{{ $product->stock }}">{{ $product->name }} - ${{ $product->price }}</option>
+                    <label for="category_id">Product</label>
+                    <select class="form-control" id="category_id" name="category_id" required>
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->id }}" data-stock="{{ $category->stock }}">{{ $category->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -49,11 +49,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('sale-form');
-            const productSelect = document.getElementById('product_id');
+            const categorySelect = document.getElementById('category_id');
             const qtyInput = document.getElementById('qty');
 
             form.addEventListener('submit', function (event) {
-                const selectedOption = productSelect.options[productSelect.selectedIndex];
+                const selectedOption = categorySelect.options[categorySelect.selectedIndex];
                 const stock = parseInt(selectedOption.getAttribute('data-stock'), 10);
                 const qty = parseInt(qtyInput.value, 10);
 

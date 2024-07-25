@@ -14,8 +14,16 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
+        DB::table('categories')->insert([
+            'name' => 'lampu SS-22',
+            'stock' => rand(10, 100),
+            'price' => rand(50000, 150000),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         DB::table('products')->insert([
-            'name' => 'lampuSS22',
+            'category_id' => '1',
             'year' => date('Y'),
             'month' => date('m'),
             'stock' => rand(10, 100),

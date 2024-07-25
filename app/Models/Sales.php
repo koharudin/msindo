@@ -30,8 +30,8 @@ class Sales extends Model
         return $this->attributes['month'];
     }
 
-    public function product()
+    public function category()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Category::class);
     }
 }

@@ -26,9 +26,9 @@
                 <div class="form-group mt-4">
                     <label for="product_id">Product</label>
                     <select class="form-control" id="product_id" name="product_id" required>
-                        @foreach ($products as $product)
-                            <option value="{{ $product->id }}" {{ $product->id == $sale->product_id ? 'selected' : '' }}>
-                                {{ $product->name }} - ${{ $product->price }}
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->id }}" {{ $category->id == $sale->category_id ? 'selected' : '' }}>
+                                {{ $category->name }} - ${{ $category->price }}
                             </option>
                         @endforeach
                     </select>

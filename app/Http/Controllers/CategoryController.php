@@ -2,38 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Sales;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
-class HomeController extends Controller
+class CategoryController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function create()
     {
-        $this->middleware('auth');
+        return view('categories.create');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function index()
+    public function store(Request $request)
     {
-        $sales = Sales::all()->count();
-        $revenue = Sales::sum('total');
-        $users = User::all()->count();
-        return view('home', compact('sales', 'revenue', 'users'));
+        $request->validate([
+            'name' => 'required',
+            'price' => 'required',
+        ]);
+
+        Category::create($request->all());
+
+        return redirect()->route('inventory');
     }
 
-    public function inventory()
+    public function show(Category $category)
+    {
+        //
+    }
+
+    public function edit(Category $category)
+    {
+        //
+    }
+
+    public function update(Request $request, Category $category)
+    {
+        //
+    }
+
+    public function destroy(Category $category)
+    {
+        //
+    }
+
+    public function stock(Category $category)
     {
         $salesData = Sales::selectRaw('YEAR(sell_date) as year, MONTH(sell_date) as month, SUM(qty) as qty')
         ->groupByRaw('YEAR(sell_date), MONTH(sell_date)')
@@ -46,10 +59,9 @@ class HomeController extends Controller
         $alphaBest = 0;
         $minMape = PHP_INT_MAX;
 
-
         for ($alpha = 0.1; $alpha <= 0.9; $alpha += 0.1) {
             $smoothedTotals = [];
-            $lastTotal = $actualTotals[0]; 
+            $lastTotal = $actualTotals[0];  // Inisialisasi dengan qty penjualan pertama
 
             foreach ($actualTotals as $actualTotal) {
                 $smoothedTotal = $alpha * $actualTotal + (1 - $alpha) * $lastTotal;
@@ -71,6 +83,7 @@ class HomeController extends Controller
             }
         }
 
+        // Prediksi dengan alpha terbaik
         $predictions = [];
         $lastTotal = $actualTotals[count($actualTotals) - 1];
 
@@ -93,17 +106,18 @@ class HomeController extends Controller
             ];
         }
 
+        // Temukan prediksi dengan MAPE terkecil
         $bestPrediction = collect($predictions)->sortBy('mape')->first();
         
-        $categories = Category::all();
+        $products = Product::where('category_id', $category->id)->get();
 
-        return view('inventory', [
+        return view('categories.stock', [
             'salesData' => $salesData,
             'predictions' => $predictions,
             'bestPrediction' => $bestPrediction,
             'alphaBest' => $alphaBest,
             'minMape' => $minMape,
-            'categories' => $categories,
+            'products' => $products,
         ]);
     }
 

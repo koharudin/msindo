@@ -3,9 +3,9 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="card-title mb-0">Stock List</h5>
+        <h5 class="card-title mb-0">Produk List</h5>
         @if (Auth::user()->role == 'admin')
-        <a href="{{ route('products.create') }}" class="btn btn-primary">Tambah Stock</a>
+        <a href="{{ route('categories.create') }}" class="btn btn-primary">Tambah Produk</a>
         @endif
     </div>
     <div class="card">
@@ -27,23 +27,22 @@
                         <th>Name</th>
                         <th>Stock</th>
                         <th>Price</th>
-                        <th>Tanggal Pembelian</th>
                         @if (Auth::user()->role == 'admin')
                         <th>Actions</th>
                         @endif
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($products as $product)
+                    @foreach ($categories as $category)
                     <tr>
-                        <td>{{ $product->category['name'] }}</td>
-                        <td>{{ $product->stock }}</td>
-                        <td>{{ $product->price }}</td>
-                        <td>{{ $product->buy_date }}</td>
+                        <td>{{ $category->name }}</td>
+                        <td>{{ $category->stock }}</td>
+                        <td>{{ $category->price }}</td>
                         @if (Auth::user()->role == 'admin')  
                         <td>
-                            <a href="{{ route('products.edit', $product->id) }}" class="btn btn-primary">Edit</a>
-                            <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display:inline;">
+                            <a href="{{ route('categories.stock', $category->id) }}" class="btn btn-warning">Stock</a>
+                            <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-primary">Edit</a>
+                            <form action="{{ route('categories.destroy', $category->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">Delete</button>

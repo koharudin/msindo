@@ -28,6 +28,7 @@
 
   <!-- Template Main CSS File -->
   <link href="/assets/css/style.css" rel="stylesheet">
+  @stack('css')
 
   <!-- =======================================================
   * Template Name: NiceAdmin
@@ -106,17 +107,17 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{{ route('products.index') }}">
+        <a class="nav-link collapsed" href="{{ route('inventory') }}">
           <i class="bi bi-box"></i>
           <span>Inventory</span>
         </a>
       </li>
-      <li class="nav-item">
+      {{-- <li class="nav-item">
         <a class="nav-link collapsed" href="{{ route('products.rop') }}">
           <i class="bi bi-box"></i>
           <span>ROP</span>
         </a>
-      </li>
+      </li> --}}
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{ route('users.index') }}">
           <i class="bi bi-people"></i>

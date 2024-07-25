@@ -2,17 +2,20 @@
 
 @section('content')
 <div class="container">
-    <h1>Add New Product</h1>
     <div class="card">
         <div class="card-header">
-            Create Product
+            tambah Stock
         </div>
         <div class="card-body">
             <form action="{{ route('products.store') }}" method="POST">
                 @csrf
                 <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
+                    <label for="name">Product</label>
+                    <select name="category_id" class="form-control" id="">
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="form-group mt-4">
                     <label for="stock">Stock</label>
