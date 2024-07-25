@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
             $table->string('invoice_number')->nullable();
-            $table->string('product_id')->nullable();
+            $table->string('category_id')->nullable();
             $table->string('qty')->nullable();
             $table->string('total')->nullable();
             $table->date('sell_date')->nullable();
