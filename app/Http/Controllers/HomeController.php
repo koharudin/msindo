@@ -36,63 +36,67 @@ class HomeController extends Controller
     public function inventory()
     {
         $salesData = Sales::selectRaw('YEAR(sell_date) as year, MONTH(sell_date) as month, SUM(qty) as qty')
-        ->groupByRaw('YEAR(sell_date), MONTH(sell_date)')
-        ->orderByRaw('YEAR(sell_date)')
-        ->orderByRaw('MONTH(sell_date)')
-        ->get();
-
-        $actualTotals = $salesData->pluck('qty')->toArray();
-
+            ->groupByRaw('YEAR(sell_date), MONTH(sell_date)')
+            ->orderByRaw('YEAR(sell_date)')
+            ->orderByRaw('MONTH(sell_date)')
+            ->get();
+    
+        $actualQtys = $salesData->pluck('qty')->toArray();
+    
         $alphaBest = 0;
         $minMape = PHP_INT_MAX;
-
-
+    
+        // Coba nilai alpha dari 0.1 hingga 0.9
         for ($alpha = 0.1; $alpha <= 0.9; $alpha += 0.1) {
-            $smoothedTotals = [];
-            $lastTotal = $actualTotals[0]; 
-
-            foreach ($actualTotals as $actualTotal) {
-                $smoothedTotal = $alpha * $actualTotal + (1 - $alpha) * $lastTotal;
-                $smoothedTotals[] = $smoothedTotal;
-                $lastTotal = $smoothedTotal;
+            $smoothedQtys = [];
+            $lastQty = $actualQtys[0];
+    
+            foreach ($actualQtys as $actualQty) {
+                $smoothedQty = $alpha * $actualQty + (1 - $alpha) * $lastQty;
+                $smoothedQtys[] = $smoothedQty;
+                $lastQty = $smoothedQty;
             }
-
+    
             $mapes = [];
-            foreach ($actualTotals as $index => $actualTotal) {
-                $mape = abs(($actualTotal - $smoothedTotals[$index]) / $actualTotal) * 100;
+            foreach ($actualQtys as $index => $actualQty) {
+                $mape = abs(($actualQty - $smoothedQtys[$index]) / $actualQty) * 100;
                 $mapes[] = $mape;
             }
-
+    
             $averageMape = array_sum($mapes) / count($mapes);
-
+    
             if ($averageMape < $minMape) {
                 $minMape = $averageMape;
                 $alphaBest = $alpha;
             }
         }
-
+    
         $predictions = [];
-        $lastTotal = $actualTotals[count($actualTotals) - 1];
-
+        $lastQty = $actualQtys[count($actualQtys) - 1];
+    
+        $lastYear = $salesData->last()->year;
+        $lastMonth = $salesData->last()->month;
+    
+        $currentMonth = $lastMonth + 1;
+        $currentYear = $lastYear;
+    
+        if ($currentMonth > 12) {
+            $currentMonth -= 12;
+            $currentYear++;
+        }
+    
         for ($i = 0; $i < 1; $i++) {
-            $lastTotal = $alphaBest * $lastTotal + (1 - $alphaBest) * $lastTotal;
-
-            $currentYear = 2024;
-            $currentMonth = 7 + $i;
-            if ($currentMonth > 12) {
-                $currentMonth -= 12;
-                $currentYear++;
-            }
-
+            $lastQty = $alphaBest * $lastQty + (1 - $alphaBest) * $lastQty;
+    
             $predictions[] = [
                 'year' => $currentYear,
                 'month' => $currentMonth,
-                'predicted_qty' => $lastTotal,
+                'predicted_qty' => $lastQty,
                 'alpha' => $alphaBest,
-                'mape' => $this->calculateMape($actualTotals, $lastTotal),
+                'mape' => $this->calculateMape($actualQtys, $lastQty),
             ];
         }
-
+    
         $bestPrediction = collect($predictions)->sortBy('mape')->first();
         
         $categories = Category::all();

@@ -218,11 +218,14 @@ class SalesController extends Controller
     
             $mapes = [];
             foreach ($actualQtys as $index => $actualQty) {
-                $mape = abs(($actualQty - $smoothedQtys[$index]) / $actualQty) * 100;
-                $mapes[] = $mape;
+                // Ensure index exists in smoothedQtys array
+                if (isset($smoothedQtys[$index])) {
+                    $mape = abs(($actualQty - $smoothedQtys[$index]) / $actualQty) * 100;
+                    $mapes[] = $mape;
+                }
             }
     
-            $averageMape = array_sum($mapes) / count($mapes);
+            $averageMape = count($mapes) ? array_sum($mapes) / count($mapes) : PHP_INT_MAX;
     
             if ($averageMape < $minMape) {
                 $minMape = $averageMape;
@@ -231,7 +234,7 @@ class SalesController extends Controller
         }
     
         $predictions = [];
-        $lastQty = $actualQtys[count($actualQtys) - 1];
+        $lastQty = end($smoothedQtys);
     
         $lastYear = $salesData->last()->year;
         $lastMonth = $salesData->last()->month;
@@ -246,17 +249,19 @@ class SalesController extends Controller
     
         $safetyStock = $this->calculateSafetyStock($actualQtys);
     
+        // Calculate prediction for the next period
+        $lastSmoothedQty = $lastQty;
         for ($i = 0; $i < 1; $i++) {
-            $lastQty = $alphaBest * $lastQty + (1 - $alphaBest) * $lastQty;
+            $lastSmoothedQty = $alphaBest * $lastSmoothedQty + (1 - $alphaBest) * $lastSmoothedQty;
     
-            $ROP = $lastQty + $safetyStock;
+            $ROP = $lastSmoothedQty + $safetyStock;
     
             $predictions[] = [
                 'year' => $currentYear,
                 'month' => $currentMonth,
-                'predicted_qty' => $lastQty,
+                'predicted_qty' => $lastSmoothedQty,
                 'alpha' => $alphaBest,
-                'mape' => $this->calculateMape($actualQtys, $lastQty),
+                'mape' => $this->calculateMape($actualQtys, $smoothedQtys),
                 'safety_stock' => $safetyStock,
                 'rop' => $ROP,
             ];
@@ -272,6 +277,13 @@ class SalesController extends Controller
     
         $sales = Sales::all();
     
+        // Include predictions for APE
+        foreach ($salesData as $index => $data) {
+            // Ensure index exists in smoothedQtys array
+            $data->predicted_qty = isset($smoothedQtys[$index]) ? $smoothedQtys[$index] : 0;
+            $data->ape = isset($data->predicted_qty) ? abs(($data->qty - $data->predicted_qty) / $data->qty) * 100 : 0;
+        }
+    
         return view('sales.predict', [
             'salesData' => $salesData,
             'predictions' => $predictions,
@@ -282,33 +294,36 @@ class SalesController extends Controller
         ]);
     }
     
-    private function calculateMape($actualQtys, $predictedQty)
+    private function calculateMape($actualQtys, $smoothedQtys)
     {
         $mapeSum = 0;
         $count = count($actualQtys);
     
-        foreach ($actualQtys as $actualQty) {
-            $mapeSum += abs(($actualQty - $predictedQty) / $actualQty) * 100;
+        foreach ($actualQtys as $index => $actualQty) {
+            // Ensure index exists in smoothedQtys array
+            if (isset($smoothedQtys[$index])) {
+                $mapeSum += abs(($actualQty - $smoothedQtys[$index]) / $actualQty) * 100;
+            }
         }
     
-        return $mapeSum / $count;
+        return $count ? $mapeSum / $count : 0;
     }
     
     private function calculateSafetyStock($data)
     {
         $meanDemand = array_sum($data) / count($data);
         $variance = 0;
-        
+    
         foreach ($data as $value) {
             $variance += pow($value - $meanDemand, 2);
         }
-        
+    
         $stdDeviation = sqrt($variance / count($data));
-        $serviceLevel = 1.65; // Contoh service level 95% (z-score)
+        $serviceLevel = 1.65; // Example service level 95% (z-score)
     
         return $serviceLevel * $stdDeviation;
     }
-    
+     
 }
 
 
